@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 
 // Constants
-const ONDE_SECOND_IN_MS = 1000
+const ONE_SECOND_IN_MS = 1000
 
 // Configuration
 const PLAYER_WIDTH = 50
@@ -13,11 +13,11 @@ const CANVAS_HEIGHT = 500
 
 // Processing
 const TICKS_PER_SECOND = 24
-const TICK_INTERVAL = ONDE_SECOND_IN_MS / TICKS_PER_SECOND
+const TICK_INTERVAL = ONE_SECOND_IN_MS / TICKS_PER_SECOND
 
 // Rendering
 const FRAMES_PER_SECOND = 30
-const RENDERING_INTERVAL = ONDE_SECOND_IN_MS / FRAMES_PER_SECOND
+const RENDERING_INTERVAL = ONE_SECOND_IN_MS / FRAMES_PER_SECOND
 
 interface PlayerInfo {
   x: number
