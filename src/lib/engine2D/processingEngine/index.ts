@@ -25,17 +25,17 @@ export class ProcessingEngine2D {
 
   processInputs() {
     for (let i = 0; i < this.gameState.entities.length; i++) {
-      const entitie = this.gameState.entities[i]
+      const entity = this.gameState.entities[i]
 
-      if (!entitie.inputs) continue
+      if (!entity.inputs) continue
 
-      for (const [key, input] of entitie.inputs) {
+      for (const [key, input] of entity.inputs) {
         if (!this.gameState.isInputActive(input)) continue
 
         const inputLogic = INPUTS_LOGIC_ENUM[key]
 
         inputLogic({
-          entitie,
+          entity,
           gameState: this.gameState,
         })
       }
