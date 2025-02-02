@@ -16,7 +16,7 @@ export class GraphicEngine2D {
   renderer: Renderer
 
   constructor({ renderingLoopConfig, gameState, renderer }: GraphicEngine2DConstructor) {
-    const renderingInterval = ONE_SECOND_IN_MS * renderingLoopConfig.framesPerSecond
+    const renderingInterval = ONE_SECOND_IN_MS / renderingLoopConfig.framesPerSecond
 
     this.gameState = gameState
     this.renderer = renderer

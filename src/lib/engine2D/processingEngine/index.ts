@@ -14,7 +14,7 @@ export class ProcessingEngine2D {
   gameState: GameState
 
   constructor({ processingLoopConfig, gameState }: ProcessingEngine2DConstructor) {
-    const tickInterval = ONE_SECOND_IN_MS * processingLoopConfig.ticksPerSecond
+    const tickInterval = ONE_SECOND_IN_MS / processingLoopConfig.ticksPerSecond
 
     this.gameState = gameState
 
