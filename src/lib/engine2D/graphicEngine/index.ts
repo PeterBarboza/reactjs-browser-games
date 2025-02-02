@@ -10,6 +10,21 @@ interface GraphicEngine2DConstructor {
   renderer: Renderer
 }
 
+/*
+ * TODO: Implementar lógica de "Interpolação de Renderização"
+ * Nessa lógica, a engine gráfica irá comparar os dois últimos estados do jogo e "advinhar"
+ * como o próximo frame deve ser desenhado com base nisso. Para isso será necessário salvar o timestamp
+ * de quando cada estado foi gerado e também manter um histórico do estado do jogo, salvando pelo menos
+ * o estado anterior, mantendo sempre o estado atual e o estado anterior para poder executar 
+ * as lógicas de comparação.
+ * 
+ * A "Posição Interpolada", como é chamada essa "advinhação" do próximo frame, é obtida através da 
+ * lógica descrita abaixo:
+ * 
+ * IntervaloDeRenderização = UmSegundoEmMilisegundos / FPS_DESEJADO
+ * FraçãoDeTempoRestante = (TimestampEstadoAtual - TimestampEstadoAnterior) / IntervaloDeRenderização
+ * PosiçãoInterpolada = PosiçãoAnterior + (FraçãoDeTempoRestante * (PosiçãoAtual - PosiçãoAnterior))
+ */
 export class GraphicEngine2D {
   renderingLoop: NodeJS.Timeout
   gameState: GameState
