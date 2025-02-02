@@ -1,7 +1,10 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-// Constants
-const ONE_SECOND_IN_MS = 1000
+import { GameState } from "@/lib/engine2D/gameState";
+import { GraphicEngine2D } from "@/lib/engine2D/graphicEngine";
+import { CanvasRenderer } from "@/lib/engine2D/graphicEngine/canvasRenderer";
+import { Renderer } from "@/lib/engine2D/graphicEngine/interface";
+import { ProcessingEngine2D } from "@/lib/engine2D/processingEngine";
 
 // Configuration
 const PLAYER_WIDTH = 50
@@ -13,182 +16,126 @@ const CANVAS_HEIGHT = 500
 
 // Processing
 const TICKS_PER_SECOND = 24
-const TICK_INTERVAL = ONE_SECOND_IN_MS / TICKS_PER_SECOND
 
 // Rendering
 const FRAMES_PER_SECOND = 30
-const RENDERING_INTERVAL = ONE_SECOND_IN_MS / FRAMES_PER_SECOND
 
-interface PlayerInfo {
-  x: number
-  y: number
-  color: string
-  previousPosition: Pick<PlayerInfo, "x" | "y"> | null
-  controls: {
-    left: string
-    up: string
-    right: string
-    down: string
-  }
-}
-interface GameState {
-  keysPressed: Set<string>
-  players: PlayerInfo[]
-}
-
+// NOTE: Not working yet
 export default function Home() {
-  const canvas = useRef<HTMLCanvasElement>(null)
-  const gameState = useRef<GameState>({
-    keysPressed: new Set(),
-    players: [
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const gameStateRef = useRef<GameState>(null)
+  const rendererRef = useRef<Renderer>(null)
+  const engineRef = useRef<ProcessingEngine2D>(null)
+  const graphicEngineRef = useRef<GraphicEngine2D>(null)
+
+  // TODO: Abstrair o setup abaixo
+  useEffect(() => {
+    if (!canvasRef.current) return
+
+    const isAlreadyInitialized = 
+      gameStateRef.current ||
+      engineRef.current ||
+      graphicEngineRef.current
+
+    if (isAlreadyInitialized) return
+
+
+    const gameState = new GameState({
+      canvas: {
+        width: CANVAS_WIDTH,
+        height: CANVAS_HEIGHT,
+      }
+    })
+    gameState.entities = [
       {
-        previousPosition: null,
-        x: 0,
-        y: 0,
-        color: "red",
-        controls: {
-          left: "ArrowLeft",
-          up: "ArrowUp",
-          right: "ArrowRight",
-          down: "ArrowDown",
-        }
+        id: "1",
+        inputs: [
+          ["left", "ArrowLeft"],
+          ["up", "ArrowUp"],
+          ["right", "ArrowRight"],
+          ["down", "ArrowDown"],
+        ],
+        parameters: {
+          baseSpeed: PLAYER_SPEED,
+          width: PLAYER_WIDTH,
+          height: PLAYER_HEIGHT,
+        },
+        position: {
+          x: 0,
+          y: 0,
+        },
+        previousPosition: null
       },
       {
-        previousPosition: null,
-        x: 50,
-        y: 50,
-        color: "blue",
-        controls: {
-          left: "a",
-          up: "w",
-          right: "d",
-          down: "s",
-        }
-      }
+        id: "2",
+        inputs: [
+          ["left", "a"],
+          ["up", "w"],
+          ["right", "d"],
+          ["down", "s"],
+        ],
+        parameters: {
+          width: PLAYER_WIDTH,
+          height: PLAYER_HEIGHT,
+          baseSpeed: PLAYER_SPEED,
+        },
+        position: {
+          x: 50,
+          y: 50,
+        },
+        previousPosition: null
+      },
     ]
-  })
+    gameStateRef.current = gameState
 
-  const processInputs = useCallback(() => {
-    for (let i = 0; i < gameState.current.players.length; i++) {
-      const player = gameState.current.players[i]
+    const canvasRenderer = new CanvasRenderer({
+      canvas: canvasRef.current,
+      gameState: gameStateRef.current,
+    })
+    rendererRef.current = canvasRenderer
 
-      if (gameState.current.keysPressed.has(player.controls.left)) {
-        if (player.x > 0) {
-          if (player.x - PLAYER_SPEED < 0) {
-            player.x = 0
-          } else {
-            player.x = player.x - PLAYER_SPEED
-          }
-        }
+    const processingEngine2D = new ProcessingEngine2D({
+      gameState: gameStateRef.current,
+      processingLoopConfig: {
+        ticksPerSecond: TICKS_PER_SECOND
       }
-      if (gameState.current.keysPressed.has(player.controls.up)) {
-        if (player.y > 0) {
-          if (player.y - PLAYER_SPEED < 0) {
-            player.y = 0
-          } else {
-            player.y = player.y - PLAYER_SPEED
-          }
-        }
-      }
-      if (gameState.current.keysPressed.has(player.controls.right)) {
-        if (player.x < CANVAS_WIDTH) {
-          if (player.x + PLAYER_SPEED + PLAYER_WIDTH >= CANVAS_WIDTH) {
-            player.x = CANVAS_WIDTH - PLAYER_WIDTH
-          } else {
-            player.x = player.x + PLAYER_SPEED
-          }
-        }
-      }
-      if (gameState.current.keysPressed.has(player.controls.down)) {
-        if (player.y < CANVAS_HEIGHT) {
-          if (player.y + PLAYER_SPEED + PLAYER_HEIGHT >= CANVAS_HEIGHT) {
-            player.y = CANVAS_HEIGHT - PLAYER_HEIGHT
-          } else {
-            player.y = player.y + PLAYER_SPEED
-          }
-        }
-      }
-    }
-  }, [])
+    })
+    engineRef.current = processingEngine2D
 
-  const draw = useCallback(() => {
-    if (!canvas.current) return null
+    const graphicEngine = new GraphicEngine2D({
+      gameState: gameStateRef.current,
+      renderer: canvasRenderer,
+      renderingLoopConfig: {
+        framesPerSecond: FRAMES_PER_SECOND
+      },
+    })
+    graphicEngineRef.current = graphicEngine
 
-    const context = canvas.current.getContext("2d")!
-
-    for (let i = 0; i < gameState.current.players.length; i++) {
-      const player = gameState.current.players[i]
-
-      if (!player.previousPosition) continue
-
-      context.clearRect(
-        player.previousPosition.x,
-        player.previousPosition.y,
-        PLAYER_WIDTH,
-        PLAYER_HEIGHT,
-      )
-    }
-
-    for (let i = 0; i < gameState.current.players.length; i++) {
-      const player = gameState.current.players[i]
-
-      gameState.current.players[i].previousPosition = {
-        x: player.x,
-        y: player.y,
-      }
-
-      context.beginPath()
-
-      context.fillStyle = player.color
-
-      context.rect(
-        player.x,
-        player.y,
-        PLAYER_WIDTH,
-        PLAYER_HEIGHT,
-      )
-
-      context.fill()
-    }
-  }, [])
-
-  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      gameState.current.keysPressed.add(event.key)
+      gameStateRef.current!.activateInput(event.key)
     }
     const onKeyUp = (event: KeyboardEvent) => {
-      gameState.current.keysPressed.delete(event.key)  
+      gameStateRef.current!.deactivateInput(event.key)
     }
     const onBlur = () => {
-      gameState.current.keysPressed.clear()
+      gameStateRef.current!.deactivateAllInputs()
     }
 
     document.addEventListener("keydown", onKeyDown)
     document.addEventListener("keyup", onKeyUp)
     window.addEventListener("blur", onBlur)
 
-    const processLoop = setInterval(() => {
-      processInputs()
-    }, TICK_INTERVAL)
-
-    const drawLoop = setInterval(() => {
-      draw()
-    }, RENDERING_INTERVAL)
-
     return () => {
       document.removeEventListener("keydown", onKeyDown)
       document.removeEventListener("keyup", onKeyUp)
       document.removeEventListener("blur", onBlur)
-
-      clearInterval(processLoop)
-      clearInterval(drawLoop)
     }
-  }, [draw, processInputs])
+  }, [])
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-zinc-400">
       <canvas
-        ref={canvas}
+        ref={canvasRef}
         className="border border-black"
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
