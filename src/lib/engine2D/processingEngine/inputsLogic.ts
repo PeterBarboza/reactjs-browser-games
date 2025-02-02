@@ -2,55 +2,55 @@ import { GameState } from "../gameState"
 import { EntityState } from "../interface"
 
 interface InputProcessingLogicParams {
-  entitie: EntityState
+  entity: EntityState
   gameState: GameState
 }
 
 export const INPUTS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogicParams) => void } = {
-  left: ({ entitie }: InputProcessingLogicParams) => {
+  left: ({ entity }: InputProcessingLogicParams) => {
     if (
-      entitie.position.x < 0 ||
-      entitie.position.x - entitie.parameters.baseSpeed < 0
+      entity.position.x < 0 ||
+      entity.position.x - entity.parameters.baseSpeed < 0
     ) {
-      entitie.position.x = 0
+      entity.position.x = 0
       return
     }
 
-    entitie.position.x = entitie.position.x - entitie.parameters.baseSpeed
+    entity.position.x = entity.position.x - entity.parameters.baseSpeed
   },
-  up: ({ entitie }: InputProcessingLogicParams) => {
+  up: ({ entity }: InputProcessingLogicParams) => {
     if (
-      entitie.position.y < 0 ||
-      entitie.position.y - entitie.parameters.baseSpeed < 0
+      entity.position.y < 0 ||
+      entity.position.y - entity.parameters.baseSpeed < 0
     ) {
-      entitie.position.y = 0
+      entity.position.y = 0
       return
     }
 
-    entitie.position.y = entitie.position.y - entitie.parameters.baseSpeed
+    entity.position.y = entity.position.y - entity.parameters.baseSpeed
   },
-  right: ({ entitie, gameState }: InputProcessingLogicParams) => {
+  right: ({ entity, gameState }: InputProcessingLogicParams) => {
     if (
-      entitie.position.x > gameState.canvas.width ||
-      entitie.position.x + entitie.parameters.width > gameState.canvas.width ||
-      entitie.position.x + entitie.parameters.baseSpeed + entitie.parameters.width >= gameState.canvas.width
+      entity.position.x > gameState.canvas.width ||
+      entity.position.x + entity.parameters.width > gameState.canvas.width ||
+      entity.position.x + entity.parameters.baseSpeed + entity.parameters.width >= gameState.canvas.width
     ) {
-      entitie.position.x = gameState.canvas.width - entitie.parameters.width
+      entity.position.x = gameState.canvas.width - entity.parameters.width
       return
     }
 
-    entitie.position.x = entitie.position.x + entitie.parameters.baseSpeed
+    entity.position.x = entity.position.x + entity.parameters.baseSpeed
   },
-  down: ({ entitie, gameState }: InputProcessingLogicParams) => {
+  down: ({ entity, gameState }: InputProcessingLogicParams) => {
     if (
-      entitie.position.y > gameState.canvas.height ||
-      entitie.position.y + entitie.parameters.height > gameState.canvas.height ||
-      entitie.position.y + entitie.parameters.baseSpeed + entitie.parameters.height >= gameState.canvas.height
+      entity.position.y > gameState.canvas.height ||
+      entity.position.y + entity.parameters.height > gameState.canvas.height ||
+      entity.position.y + entity.parameters.baseSpeed + entity.parameters.height >= gameState.canvas.height
     ) {
-      entitie.position.y = gameState.canvas.height - entitie.parameters.height
+      entity.position.y = gameState.canvas.height - entity.parameters.height
       return
     }
 
-    entitie.position.y = entitie.position.y + entitie.parameters.baseSpeed
+    entity.position.y = entity.position.y + entity.parameters.baseSpeed
   },
 }
