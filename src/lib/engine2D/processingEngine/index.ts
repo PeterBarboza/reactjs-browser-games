@@ -30,13 +30,19 @@ export class ProcessingEngine2D {
       if (!entity.inputs) continue
 
       for (const [key, input] of entity.inputs) {
-        if (!this.gameState.isInputActive(input)) continue
+        const inputState = this.gameState.getInputState(input)
+        
+        if (inputState === "deactivated") continue
+        if (inputState === "toDeactivate") {
+          this.gameState.clearInput(input)
+        }
 
         const inputLogic = INPUTS_LOGIC_ENUM[key]
 
         inputLogic({
           entity,
           gameState: this.gameState,
+          inputState,
         })
       }
     }

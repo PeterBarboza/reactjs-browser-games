@@ -1,10 +1,22 @@
+export type EntityParameters = {
+  width: number
+  height: number
+  baseSpeed: number
+  maxSpeed: number
+  acceleration: number
+  timeAccelerating: number
+} | {
+  width: number
+  height: number
+  baseSpeed: number
+  maxSpeed: null
+  acceleration: null
+  timeAccelerating: null
+}
+
 export interface EntityState {
   id: string
-  parameters: {
-    width: number
-    height: number
-    baseSpeed: number
-  }
+  parameters: EntityParameters
   position: {
     x: number
     y: number

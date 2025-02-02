@@ -10,15 +10,17 @@ import { ProcessingEngine2D } from "@/lib/engine2D/processingEngine";
 const PLAYER_WIDTH = 50
 const PLAYER_HEIGHT = 50
 const PLAYER_SPEED = 5
+const PLAYER_MAX_SPEED = PLAYER_SPEED * 4
+const PLAYER_ACCELERATION = 1
 
 const CANVAS_WIDTH = 500
 const CANVAS_HEIGHT = 500
 
 // Processing
-const TICKS_PER_SECOND = 24
+const TICKS_PER_SECOND = 30
 
 // Rendering
-const FRAMES_PER_SECOND = 30
+const FRAMES_PER_SECOND = 60
 
 // NOTE: Not working yet
 export default function Home() {
@@ -39,7 +41,6 @@ export default function Home() {
 
     if (isAlreadyInitialized) return
 
-
     const gameState = new GameState({
       canvas: {
         width: CANVAS_WIDTH,
@@ -59,6 +60,9 @@ export default function Home() {
           baseSpeed: PLAYER_SPEED,
           width: PLAYER_WIDTH,
           height: PLAYER_HEIGHT,
+          maxSpeed: null,
+          timeAccelerating: null,
+          acceleration: null,
         },
         position: {
           x: 0,
@@ -78,6 +82,9 @@ export default function Home() {
           width: PLAYER_WIDTH,
           height: PLAYER_HEIGHT,
           baseSpeed: PLAYER_SPEED,
+          maxSpeed: PLAYER_MAX_SPEED,
+          timeAccelerating: 0,
+          acceleration: PLAYER_ACCELERATION,
         },
         position: {
           x: 50,

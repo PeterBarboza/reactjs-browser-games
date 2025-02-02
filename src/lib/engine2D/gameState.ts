@@ -1,11 +1,14 @@
 import { CanvasState, EntityState } from "./interface"
 
+export type InputState = "active" | "toDeactivate" | "deactivated"
+
 interface GameStateConstructor {
   canvas: CanvasState
 }
 
 export class GameState {
   private activeInputs = new Set<string>()
+  private toDeactivateInputs = new Set<string>()
   entities: EntityState[] = []
   canvas: CanvasState
 
@@ -18,14 +21,35 @@ export class GameState {
   }
 
   deactivateInput(input: string) {
+    this.toDeactivateInputs.add(input)
     this.activeInputs.delete(input)
   }
 
-  isInputActive(input: string) {
-    return this.activeInputs.has(input)
+  deactivateAllInputs() {
+    this.toDeactivateInputs.clear()
+    this.toDeactivateInputs = new Set(this.activeInputs)
+    this.activeInputs.clear()
   }
 
-  deactivateAllInputs() {
+  clearInput(input: string) {
+    this.activeInputs.delete(input)
+    this.toDeactivateInputs.delete(input)
+  }
+
+  clearAllInputs() {
     this.activeInputs.clear()
+    this.toDeactivateInputs.clear()
+  }
+
+  getInputState(input: string): InputState {
+    if (this.activeInputs.has(input)) {
+      return "active"
+    }
+
+    if (this.toDeactivateInputs.has(input)) {
+      return "toDeactivate"
+    }
+
+    return "deactivated"
   }
 }
