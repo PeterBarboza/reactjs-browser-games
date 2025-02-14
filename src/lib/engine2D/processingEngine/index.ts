@@ -1,6 +1,6 @@
 import { ONE_SECOND_IN_MS } from "../constants"
-import { GameState } from "../gameState"
-import { INPUTS_LOGIC_ENUM } from "./inputsLogic"
+import { GameState, INPUT_STATE_ENUM, InputState } from "../gameState"
+import { CONTROLS_LOGIC_ENUM } from "./inputsLogic"
 
 interface ProcessingEngine2DConstructor {
   processingLoopConfig: {
@@ -27,19 +27,61 @@ export class ProcessingEngine2D {
     for (let i = 0; i < this.gameState.entities.length; i++) {
       const entity = this.gameState.entities[i]
 
-      if (!entity.inputs) continue
+      if (!entity.controls) continue
 
-      for (const [key, input] of entity.inputs) {
-        const inputState = this.gameState.getInputState(input)
-        
-        if (inputState === "deactivated") continue
-        if (inputState === "toDeactivate") {
-          this.gameState.clearInput(input)
+      const parsedInputs = new Map<string, { state: InputState }>()
+      const notIncludeInParsedResult: Record<string, true> = {}
+
+      if (entity.controls.combination) {
+        for (const { key, parts } of entity.controls.combination) {
+          let combination: InputState = INPUT_STATE_ENUM.active
+
+          for (const part of parts) {
+            const inputState = this.gameState.getInputState(part)
+
+            if (inputState === INPUT_STATE_ENUM.deactivated) {
+              combination = INPUT_STATE_ENUM.deactivated
+              break
+            }
+            if (inputState === INPUT_STATE_ENUM.toDeactivate) {
+              combination = INPUT_STATE_ENUM.toDeactivate
+              continue
+            }
+          }
+
+          if (combination === INPUT_STATE_ENUM.active) {
+            for (const part of parts) notIncludeInParsedResult[part] = true
+
+            parsedInputs.set(key, { state: INPUT_STATE_ENUM.active })
+          }
         }
+      }
 
-        const inputLogic = INPUTS_LOGIC_ENUM[key]
+      if (entity.controls.simple) {
+        for (const { key, input } of entity.controls.simple) {
+          if (notIncludeInParsedResult[input]) continue
 
-        inputLogic({
+          const inputState = this.gameState.getInputState(input)
+
+          if (inputState === INPUT_STATE_ENUM.toDeactivate) {
+            this.gameState.clearInput(input)
+          }
+
+          parsedInputs.set(key, { state: inputState })
+        }
+      }
+
+
+      for (const [key, { state }] of parsedInputs) {
+        const inputState = state
+
+        if (inputState === INPUT_STATE_ENUM.deactivated) continue
+
+        const controlLogic = CONTROLS_LOGIC_ENUM[key]
+
+        if (!controlLogic) continue
+
+        controlLogic({
           entity,
           gameState: this.gameState,
           inputState,

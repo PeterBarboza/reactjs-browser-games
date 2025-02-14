@@ -14,6 +14,16 @@ export type EntityParameters = {
   timeAccelerating: null
 }
 
+export type EntitySimpleControl = {
+  key: string
+  input: string
+}
+
+export type EntityCombinationControl = {
+  key: string
+  parts: Set<string>
+}
+
 export interface EntityState {
   id: string
   parameters: EntityParameters
@@ -25,7 +35,10 @@ export interface EntityState {
     x: number
     y: number
   } | null
-  inputs: [string, string][] | null
+  controls: {
+    simple: EntitySimpleControl[] | null
+    combination: EntityCombinationControl[] | null
+  }
 }
 
 export interface CanvasState {

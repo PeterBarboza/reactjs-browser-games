@@ -10,7 +10,7 @@ import { ProcessingEngine2D } from "@/lib/engine2D/processingEngine";
 const PLAYER_WIDTH = 50
 const PLAYER_HEIGHT = 50
 const PLAYER_SPEED = 5
-const PLAYER_MAX_SPEED = PLAYER_SPEED * 4
+const PLAYER_MAX_SPEED = PLAYER_SPEED * 5
 const PLAYER_ACCELERATION = 1
 
 const CANVAS_WIDTH = 500
@@ -50,19 +50,51 @@ export default function Home() {
     gameState.entities = [
       {
         id: "1",
-        inputs: [
-          ["left", "ArrowLeft"],
-          ["up", "ArrowUp"],
-          ["right", "ArrowRight"],
-          ["down", "ArrowDown"],
-        ],
+        controls: {
+          simple: [
+            {
+              key: "left",
+              input: "ArrowLeft",
+            },
+            {
+              key: "up",
+              input: "ArrowUp",
+            },
+            {
+              key: "right",
+              input: "ArrowRight",
+            },
+            {
+              key: "down",
+              input: "ArrowDown",
+            },
+          ],
+          combination: [
+            {
+              key: "leftUp",
+              parts: new Set(["ArrowLeft", "ArrowUp"])
+            },
+            {
+              key: "leftDown",
+              parts: new Set(["ArrowLeft", "ArrowDown"])
+            },
+            {
+              key: "rightUp",
+              parts: new Set(["ArrowRight", "ArrowUp"])
+            },
+            {
+              key: "rightDown",
+              parts: new Set(["ArrowRight", "ArrowDown"])
+            },
+          ],
+        },
         parameters: {
           baseSpeed: PLAYER_SPEED,
           width: PLAYER_WIDTH,
           height: PLAYER_HEIGHT,
-          maxSpeed: null,
-          timeAccelerating: null,
-          acceleration: null,
+          maxSpeed: PLAYER_MAX_SPEED,
+          timeAccelerating: 0,
+          acceleration: PLAYER_ACCELERATION,
         },
         position: {
           x: 0,
@@ -72,12 +104,44 @@ export default function Home() {
       },
       {
         id: "2",
-        inputs: [
-          ["left", "a"],
-          ["up", "w"],
-          ["right", "d"],
-          ["down", "s"],
-        ],
+        controls: {
+          simple: [
+            {
+              key: "left",
+              input: "a",
+            },
+            {
+              key: "up",
+              input: "w",
+            },
+            {
+              key: "right",
+              input: "d",
+            },
+            {
+              key: "down",
+              input: "s",
+            },
+          ],
+          combination: [
+            {
+              key: "leftUp",
+              parts: new Set(["a", "w"])
+            },
+            {
+              key: "leftDown",
+              parts: new Set(["a", "s"])
+            },
+            {
+              key: "rightUp",
+              parts: new Set(["d", "w"])
+            },
+            {
+              key: "rightDown",
+              parts: new Set(["d", "s"])
+            },
+          ],
+        },
         parameters: {
           width: PLAYER_WIDTH,
           height: PLAYER_HEIGHT,

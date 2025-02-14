@@ -1,6 +1,12 @@
 import { CanvasState, EntityState } from "./interface"
 
-export type InputState = "active" | "toDeactivate" | "deactivated"
+export enum INPUT_STATE_ENUM {
+  active,
+  toDeactivate,
+  deactivated,
+}
+
+export type InputState = INPUT_STATE_ENUM
 
 interface GameStateConstructor {
   canvas: CanvasState
@@ -43,13 +49,13 @@ export class GameState {
 
   getInputState(input: string): InputState {
     if (this.activeInputs.has(input)) {
-      return "active"
+      return INPUT_STATE_ENUM.active
     }
 
     if (this.toDeactivateInputs.has(input)) {
-      return "toDeactivate"
+      return INPUT_STATE_ENUM.toDeactivate
     }
 
-    return "deactivated"
+    return INPUT_STATE_ENUM.deactivated
   }
 }
