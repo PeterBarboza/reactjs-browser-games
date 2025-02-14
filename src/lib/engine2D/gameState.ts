@@ -8,18 +8,30 @@ export enum INPUT_STATE_ENUM {
 
 export type InputState = INPUT_STATE_ENUM
 
+interface InputProcessingLogicParams {
+  entity: EntityState
+  gameState: GameState
+  inputState: InputState | null
+}
+export interface ControlsHandlers {
+  [key: string]: (param: InputProcessingLogicParams) => void
+}
+
 interface GameStateConstructor {
   canvas: CanvasState
+  controlsHandlers: ControlsHandlers
 }
 
 export class GameState {
   private activeInputs = new Set<string>()
   private toDeactivateInputs = new Set<string>()
+  controlsHandlers: ControlsHandlers = {}
   entities: EntityState[] = []
   canvas: CanvasState
 
-  constructor({ canvas }: GameStateConstructor) {
+  constructor({ canvas, controlsHandlers }: GameStateConstructor) {
     this.canvas = canvas
+    this.controlsHandlers = controlsHandlers
   }
 
   activateInput(input: string) {

@@ -1,66 +1,8 @@
-import { GameState, INPUT_STATE_ENUM, InputState } from "../gameState"
-import { EntityState } from "../interface"
+import { ControlsHandlers, INPUT_STATE_ENUM } from "../../gameState"
+import { calculateAcceleration, calculateVectorialAcceleration } from "../../utils/physics"
 
-interface CalculateAccelerationParams {
-  parameters: {
-    acceleration: number | null
-    timeAccelerating: number | null
-    baseSpeed: number
-    maxSpeed: number | null
-  }
-  entity: EntityState
-}
-
-interface CalculateVectorialMovementSpeedParams {
-  parameters: {
-    acceleration: number | null
-    timeAccelerating: number | null
-    baseSpeed: number
-    maxSpeed: number | null
-  }
-  entity: EntityState
-}
-
-// Lógica de aceleração | vf = vi + (a ⋅ t)
-function calculateAcceleration({
-  parameters,
-  entity,
-}: CalculateAccelerationParams) {
-  let newSpeed: number
-
-  if (parameters.acceleration === null || parameters.timeAccelerating === null) {
-    newSpeed = parameters.baseSpeed
-    return newSpeed
-  }
-
-  newSpeed = parameters.baseSpeed + (parameters.acceleration * parameters.timeAccelerating)
-
-  if (parameters.maxSpeed && newSpeed > parameters.maxSpeed) {
-    newSpeed = parameters.maxSpeed
-  } else {
-    entity.parameters.timeAccelerating = parameters.timeAccelerating + 1
-  }
-
-  return newSpeed
-}
-
-function calculateVectorialMovementSpeed({
-  parameters,
-  entity,
-}: CalculateVectorialMovementSpeedParams) {
-  const newSpeed = calculateAcceleration({ parameters, entity })
-
-  return Math.floor(newSpeed / Math.sqrt(2))
-}
-
-interface InputProcessingLogicParams {
-  entity: EntityState
-  gameState: GameState
-  inputState: InputState | null
-}
-
-export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogicParams) => void } = {
-  left: ({ entity, inputState }: InputProcessingLogicParams) => {
+export const TOP_DOWN_CONTROLS_HANDLERS: ControlsHandlers = {
+  left: ({ entity, inputState }) => {
     if (inputState === INPUT_STATE_ENUM.toDeactivate) {
       if (entity.parameters.timeAccelerating !== null) {
         entity.parameters.timeAccelerating = 0
@@ -93,7 +35,7 @@ export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogic
 
     entity.position.x = entity.position.x - currentSpeed
   },
-  up: ({ entity, inputState }: InputProcessingLogicParams) => {
+  up: ({ entity, inputState }) => {
     if (inputState === INPUT_STATE_ENUM.toDeactivate) {
       if (entity.parameters.timeAccelerating !== null) {
         entity.parameters.timeAccelerating = 0
@@ -125,7 +67,7 @@ export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogic
 
     entity.position.y = entity.position.y - currentSpeed
   },
-  right: ({ entity, gameState, inputState }: InputProcessingLogicParams) => {
+  right: ({ entity, gameState, inputState }) => {
     if (inputState === INPUT_STATE_ENUM.toDeactivate) {
       if (entity.parameters.timeAccelerating !== null) {
         entity.parameters.timeAccelerating = 0
@@ -158,7 +100,7 @@ export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogic
 
     entity.position.x = entity.position.x + currentSpeed
   },
-  down: ({ entity, gameState, inputState }: InputProcessingLogicParams) => {
+  down: ({ entity, gameState, inputState }) => {
     if (inputState === INPUT_STATE_ENUM.toDeactivate) {
       if (entity.parameters.timeAccelerating !== null) {
         entity.parameters.timeAccelerating = 0
@@ -191,7 +133,7 @@ export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogic
 
     entity.position.y = entity.position.y + currentSpeed
   },
-  leftUp: ({ entity, inputState }: InputProcessingLogicParams) => {
+  leftUp: ({ entity, inputState }) => {
     if (inputState === INPUT_STATE_ENUM.toDeactivate) {
       if (entity.parameters.timeAccelerating !== null) {
         entity.parameters.timeAccelerating = 0
@@ -199,7 +141,7 @@ export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogic
       return
     }
 
-    const currentSpeed = calculateVectorialMovementSpeed({
+    const currentSpeed = calculateVectorialAcceleration({
       parameters: {
         acceleration: entity.parameters.acceleration,
         timeAccelerating: entity.parameters.timeAccelerating,
@@ -235,7 +177,7 @@ export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogic
       entity.position.y = entity.position.y - currentSpeed
     }
   },
-  leftDown: ({ entity, gameState, inputState }: InputProcessingLogicParams) => {
+  leftDown: ({ entity, gameState, inputState }) => {
     if (inputState === INPUT_STATE_ENUM.toDeactivate) {
       if (entity.parameters.timeAccelerating !== null) {
         entity.parameters.timeAccelerating = 0
@@ -243,7 +185,7 @@ export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogic
       return
     }
 
-    const currentSpeed = calculateVectorialMovementSpeed({
+    const currentSpeed = calculateVectorialAcceleration({
       parameters: {
         acceleration: entity.parameters.acceleration,
         timeAccelerating: entity.parameters.timeAccelerating,
@@ -281,7 +223,7 @@ export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogic
     }
 
   },
-  rightUp: ({ entity, gameState, inputState }: InputProcessingLogicParams) => {
+  rightUp: ({ entity, gameState, inputState }) => {
     if (inputState === INPUT_STATE_ENUM.toDeactivate) {
       if (entity.parameters.timeAccelerating !== null) {
         entity.parameters.timeAccelerating = 0
@@ -289,7 +231,7 @@ export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogic
       return
     }
 
-    const currentSpeed = calculateVectorialMovementSpeed({
+    const currentSpeed = calculateVectorialAcceleration({
       parameters: {
         acceleration: entity.parameters.acceleration,
         timeAccelerating: entity.parameters.timeAccelerating,
@@ -326,7 +268,7 @@ export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogic
       entity.position.y = entity.position.y - currentSpeed
     }
   },
-  rightDown: ({ entity, gameState, inputState }: InputProcessingLogicParams) => {
+  rightDown: ({ entity, gameState, inputState }) => {
     if (inputState === INPUT_STATE_ENUM.toDeactivate) {
       if (entity.parameters.timeAccelerating !== null) {
         entity.parameters.timeAccelerating = 0
@@ -334,7 +276,7 @@ export const CONTROLS_LOGIC_ENUM: { [key: string]: (params: InputProcessingLogic
       return
     }
 
-    const currentSpeed = calculateVectorialMovementSpeed({
+    const currentSpeed = calculateVectorialAcceleration({
       parameters: {
         acceleration: entity.parameters.acceleration,
         timeAccelerating: entity.parameters.timeAccelerating,

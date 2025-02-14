@@ -5,6 +5,7 @@ import { GraphicEngine2D } from "@/lib/engine2D/graphicEngine";
 import { CanvasRenderer } from "@/lib/engine2D/graphicEngine/canvasRenderer";
 import { Renderer } from "@/lib/engine2D/graphicEngine/interface";
 import { ProcessingEngine2D } from "@/lib/engine2D/processingEngine";
+import { TOP_DOWN_CONTROLS_HANDLERS } from "@/lib/engine2D/preset/topdown/inputsLogic";
 
 // Configuration
 const PLAYER_WIDTH = 50
@@ -45,7 +46,8 @@ export default function Home() {
       canvas: {
         width: CANVAS_WIDTH,
         height: CANVAS_HEIGHT,
-      }
+      },
+      controlsHandlers: TOP_DOWN_CONTROLS_HANDLERS
     })
     gameState.entities = [
       {

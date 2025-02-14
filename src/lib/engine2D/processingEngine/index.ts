@@ -1,6 +1,5 @@
 import { ONE_SECOND_IN_MS } from "../constants"
 import { GameState, INPUT_STATE_ENUM, InputState } from "../gameState"
-import { CONTROLS_LOGIC_ENUM } from "./inputsLogic"
 
 interface ProcessingEngine2DConstructor {
   processingLoopConfig: {
@@ -71,17 +70,16 @@ export class ProcessingEngine2D {
         }
       }
 
-
       for (const [key, { state }] of parsedInputs) {
         const inputState = state
 
         if (inputState === INPUT_STATE_ENUM.deactivated) continue
 
-        const controlLogic = CONTROLS_LOGIC_ENUM[key]
+        const controlHandler = this.gameState.controlsHandlers[key]
 
-        if (!controlLogic) continue
+        if (!controlHandler) continue
 
-        controlLogic({
+        controlHandler({
           entity,
           gameState: this.gameState,
           inputState,
